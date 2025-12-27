@@ -19,6 +19,7 @@ class UserController {
 
       res.status(HttpStatus.CREATED).json(user);
     } catch (err) {
+      console.error(err);
       next(err);
     }
   }

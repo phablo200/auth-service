@@ -13,4 +13,5 @@ class ApplicationRepository {
     return result.rows[0] || null;
   }
 }
+
 export default new ApplicationRepository();

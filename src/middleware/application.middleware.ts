@@ -11,9 +11,7 @@ async function requireApplicationId(req: Request, res: Response, next: NextFunct
       error: req.t("application.missingApplicationId"),
     });
   }
-
-  console.log({ applicationId, DEFAULT_APPLICATION_ID });
-
+  
   if (applicationId !== DEFAULT_APPLICATION_ID && !uuidValidate(applicationId)) {
     return res.status(400).json({
       error: req.t("application.invalidApplicationId"),

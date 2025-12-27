@@ -15,6 +15,14 @@
       "missingApplicationId": "Missing x-application-id header",
       "notFound": "Application not found",
       "invalidApplicationId": "Invalid application ID"
+    },
+    "user": {
+      "name.required": "Name is required",
+      "email.required": "Email is required",
+      "email.invalid": "Invalid email",
+      "password.minLength": "Password must be at least 8 characters long",
+      "password.uppercase": "Password must contain at least one uppercase letter",
+      "password.number": "Password must contain at least one number"
     }
   }
   

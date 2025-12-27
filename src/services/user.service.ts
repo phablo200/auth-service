@@ -9,6 +9,7 @@ import {
   EmailAlreadyInUseError,
   UserNotFoundError,
 } from "../errors/user.error";
+import { validateCreateUserInput, validateUpdateUserInput } from "../validators/user.validator";
 
 class UserService {
   async createUser(
@@ -19,13 +20,13 @@ class UserService {
     profile_id: string = DEFAULT_PROFILE_ID,
     created_by: string = DEFAULT_USER_ID
   ): Promise<UserModel> {
+    validateCreateUserInput({ name, email, password });
+
     const existingUser = await userRepository.findByEmailRegistered(
       applicationId,
       email
     );
-
     const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
-
     if (existingUser && existingUser.deleted) {
       await userRepository.undeleteById(applicationId, existingUser.id);
       await userRepository.updatePassword(
@@ -79,6 +80,7 @@ class UserService {
     id: string,
     data: Partial<Omit<UserModel, "id" | "created_at" | "application_id">>
   ): Promise<UserModel> {
+    validateUpdateUserInput(data);
     const updatedUser = await userRepository.update(
       applicationId,
       id,

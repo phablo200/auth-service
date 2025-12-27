@@ -6,6 +6,7 @@ import { UserModel } from "../models/user.model";
 import { DEFAULT_USER_ID } from "../constants/user.constants";
 import { DEFAULT_PROFILE_ID } from "../constants/profile.constants";
 import { DecodedToken } from "../models/auth.model";
+import { validateSignInInput, validateSignUpInput } from "../validators/auth.validator";
 
 import {
   InvalidCredentialsError,
@@ -15,11 +16,12 @@ import {
 } from "../errors/auth.error";
 
 class AuthService {
-  async login(
+  async signIn(
     applicationId: string,
     email: string,
     password: string
   ): Promise<{ token: string; user: UserModel }> {
+    validateSignInInput({ email, password });
     const user = await userRepository.findByEmail(applicationId, email);
 
     if (!user || user.deleted) {
@@ -59,6 +61,7 @@ class AuthService {
     profile_id: string = DEFAULT_PROFILE_ID,
     created_by: string = DEFAULT_USER_ID
   ): Promise<UserModel> {
+    validateSignUpInput({ name, email, password });
     const existingUser = await userRepository.findByEmailRegistered(
       applicationId,
       email

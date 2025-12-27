@@ -5,12 +5,12 @@ import { getApplicationId } from "../middleware/application.middleware";
 import { getAuthToken } from "../middleware/authorization.middleware";
 
 class AuthController {
-  async login(req: Request, res: Response, next: NextFunction) {
+  async signIn(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password } = req.body;
       const applicationId = getApplicationId(req)!;
 
-      const result = await authService.login(
+      const result = await authService.signIn(
         applicationId,
         email,
         password

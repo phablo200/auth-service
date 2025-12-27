@@ -15,5 +15,13 @@
     "missingApplicationId": "Falta o cabeçalho x-application-id",
     "notFound": "Application not found",
     "invalidApplicationId": "ID de aplicação inválido"
+  },
+  "user": {
+    "name.required": "Nome é obrigatório",
+    "email.required": "Email é obrigatório",
+    "email.invalid": "Email inválido",
+    "password.minLength": "A senha deve ter pelo menos 8 caracteres",
+    "password.uppercase": "A senha deve conter pelo menos uma letra maiúscula",
+    "password.number": "A senha deve conter pelo menos um número"
   }
 }
