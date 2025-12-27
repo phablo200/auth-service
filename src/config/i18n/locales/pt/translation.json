@@ -1,0 +1,19 @@
+{
+  "errors": {
+    "invalidCredentials": "Credenciais inválidas",
+    "emailAlreadyInUse": "Email já está em uso",
+    "userNotFound": "Usuário não encontrado",
+    "invalidToken": "Token inválido",
+    "unauthorized": "Não autorizado",
+    "internalServerError": "Erro interno do servidor"
+  },
+  "auth": {
+    "passwordResetSent": "Email de redefinição enviado",
+    "passwordResetSuccess": "Senha redefinida com sucesso"
+  },
+  "application": {
+    "missingApplicationId": "Falta o cabeçalho x-application-id",
+    "notFound": "Application not found",
+    "invalidApplicationId": "ID de aplicação inválido"
+  }
+}

@@ -1,0 +1,20 @@
+{
+    "errors": {
+      "invalidCredentials": "Invalid credentials",
+      "emailAlreadyInUse": "Email already in use",
+      "userNotFound": "User not found",
+      "invalidToken": "Invalid token",
+      "unauthorized": "Unauthorized",
+      "internalServerError": "Internal server error"
+    },
+    "auth": {
+      "passwordResetSent": "Password reset email sent",
+      "passwordResetSuccess": "Password reset successfully"
+    },
+    "application": {
+      "missingApplicationId": "Missing x-application-id header",
+      "notFound": "Application not found",
+      "invalidApplicationId": "Invalid application ID"
+    }
+  }
+  
