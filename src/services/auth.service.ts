@@ -6,7 +6,7 @@ import { UserModel } from "../models/user.model";
 import { DEFAULT_USER_ID } from "../constants/user.constants";
 import { DEFAULT_PROFILE_ID } from "../constants/profile.constants";
 import { DecodedToken } from "../models/auth.model";
-import { validateSignInInput, validateSignUpInput } from "../validators/auth.validator";
+import { validateForgotPasswordInput, validateSignInInput, validateSignUpInput } from "../validators/auth.validator";
 
 import {
   InvalidCredentialsError,
@@ -14,6 +14,7 @@ import {
   UserNotFoundError,
   EmailAlreadyInUseError,
 } from "../errors/auth.error";
+import emailService from "./email.service";
 
 class AuthService {
   async signIn(
@@ -135,7 +136,10 @@ class AuthService {
     return { refreshedToken };
   }
 
-  async forgotPassword(): Promise<{ message: string }> {
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    validateForgotPasswordInput({ email });
+    const testEmail = "pablovilasboas24@gmail.com";
+    await emailService.sendTestEmail(testEmail);
     return { message: "Password reset email sent" };
   }
 

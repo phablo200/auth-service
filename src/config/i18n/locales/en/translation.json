@@ -9,7 +9,9 @@
     },
     "auth": {
       "passwordResetSent": "Password reset email sent",
-      "passwordResetSuccess": "Password reset successfully"
+      "passwordResetSuccess": "Password reset successfully",
+      "forgotPasswordEmailSent": "Forgot password email sent",
+      "email.invalid": "Invalid email"
     },
     "application": {
       "missingApplicationId": "Missing x-application-id header",

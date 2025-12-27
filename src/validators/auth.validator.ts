@@ -31,6 +31,12 @@ export const signUpSchema = z.object({
     .min(1, "auth.password.required"),
 });
 
+const forgotPasswordSchema = z.object({
+    email: z
+      .email("auth.email.invalid")
+      .min(1, "auth.email.required"),
+  });
+
 /**
  * Helpers
  */
@@ -46,6 +52,16 @@ export function validateSignInInput(data: unknown) {
 
 export function validateSignUpInput(data: unknown) {
   const result = signUpSchema.safeParse(data);
+
+  if (!result.success) {
+    throw new AppError(result.error.issues[0].message, 400);
+  }
+
+  return result.data;
+}
+
+export function validateForgotPasswordInput(data: unknown) {
+  const result = forgotPasswordSchema.safeParse(data);
 
   if (!result.success) {
     throw new AppError(result.error.issues[0].message, 400);
