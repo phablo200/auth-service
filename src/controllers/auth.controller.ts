@@ -66,7 +66,7 @@ class AuthController {
     try {
       const { email } = req.body;
       const result = await authService.forgotPassword(email);
-      res.status(HttpStatus.OK).json(result);
+      res.status(HttpStatus.OK).json({ message: req.t(result.messageKey) });
     } catch (err) {
       next(err);
     }
@@ -75,15 +75,14 @@ class AuthController {
   async resetPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { token, new_password: newPassword } = req.body;
-      const applicationId = getApplicationId(req)!;
+
 
       const result = await authService.resetPassword(
-        applicationId,
         token,
         newPassword
       );
 
-      res.status(HttpStatus.OK).json(result);
+      res.status(HttpStatus.OK).json({ message: req.t(result.messageKey) });
     } catch (err) {
       next(err);
     }

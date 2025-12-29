@@ -10,7 +10,7 @@
     "auth": {
       "passwordResetSent": "Password reset email sent",
       "passwordResetSuccess": "Password reset successfully",
-      "forgotPasswordEmailSent": "Forgot password email sent",
+      "forgotPasswordEmailSent": "if the email exists, a reset link was sent",
       "email.invalid": "Invalid email"
     },
     "application": {

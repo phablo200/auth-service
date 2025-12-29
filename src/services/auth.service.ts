@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import userRepository from "../repositories/user.repository";
 import { BCRYPT_SALT_ROUNDS, JWT_EXPIRES_IN } from "../constants/auth.constants";
@@ -6,15 +7,17 @@ import { UserModel } from "../models/user.model";
 import { DEFAULT_USER_ID } from "../constants/user.constants";
 import { DEFAULT_PROFILE_ID } from "../constants/profile.constants";
 import { DecodedToken } from "../models/auth.model";
-import { validateForgotPasswordInput, validateSignInInput, validateSignUpInput } from "../validators/auth.validator";
-
+import passwordResetRepository from "../repositories/password-reset.repository";
+import { validateSignInInput, validateSignUpInput } from "../validators/auth.validator";
 import {
   InvalidCredentialsError,
   InvalidTokenError,
   UserNotFoundError,
   EmailAlreadyInUseError,
 } from "../errors/auth.error";
-import emailService from "./email.service";
+import emailService from "../mail/email.service";
+import { DEFAULT_APPLICATION_ID } from "../constants/application.constants";
+import { generatePasswordResetToken } from "../util/password.util";
 
 class AuthService {
   async signIn(
@@ -136,53 +139,76 @@ class AuthService {
     return { refreshedToken };
   }
 
-  async forgotPassword(email: string): Promise<{ message: string }> {
-    validateForgotPasswordInput({ email });
-    const testEmail = "pablovilasboas24@gmail.com";
-    await emailService.sendTestEmail(testEmail);
-    return { message: "Password reset email sent" };
+  async forgotPassword(email: string): Promise<{ messageKey: string }> {
+    const user = await userRepository.findByEmailRegistered(
+      DEFAULT_APPLICATION_ID,
+      email
+    );
+
+    // 🔒 Prevent email enumeration
+    if (!user || user.deleted) {
+      return { messageKey: 'auth.forgotPasswordEmailSent' };
+    }
+
+    const { rawToken, tokenHash } = generatePasswordResetToken();
+
+    const expiresAt = new Date(
+      Date.now() + 1000 * 60 * 15 // 15 minutes
+    );
+
+    await passwordResetRepository.create(
+      user.id,
+      tokenHash,
+      expiresAt
+    );
+
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${rawToken}`;
+    console.log(resetLink);
+
+    await emailService.sendForgotPasswordEmail(
+      user.email,
+      resetLink
+    );
+
+    return {
+      messageKey: 'auth.forgotPasswordEmailSent',
+    };
   }
 
   async resetPassword(
-    applicationId: string,
     token: string,
     newPassword: string
-  ): Promise<{ message: string }> {
-    let decodedToken: DecodedToken;
-
-    try {
-      decodedToken = jwt.verify(
-        token,
-        process.env.JWT_SECRET as string
-      ) as DecodedToken;
-    } catch {
+  ): Promise<{ messageKey: string }> {
+    const tokenHash = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+  
+    const resetToken =
+      await passwordResetRepository.findValidToken(tokenHash);
+  
+    if (!resetToken) {
       throw new InvalidTokenError();
     }
-
-    const user = await userRepository.findById(
-      applicationId,
-      decodedToken.sub
-    );
-
-    if (!user) {
-      throw new UserNotFoundError();
-    }
-
+  
     const hashedPassword = await bcrypt.hash(
       newPassword,
       BCRYPT_SALT_ROUNDS
     );
-
+  
     await userRepository.updatePassword(
-      applicationId,
-      user.id,
+      DEFAULT_APPLICATION_ID,
+      resetToken.user_id,
       hashedPassword
     );
-
+  
+    await passwordResetRepository.markAsUsed(resetToken.id);
+  
     return {
-      message: "Password reset successfully",
+      messageKey: 'auth.passwordResetSuccess',
     };
-  }
+  } 
+
 }
 
 export default new AuthService();

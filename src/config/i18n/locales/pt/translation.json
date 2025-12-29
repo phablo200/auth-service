@@ -10,7 +10,7 @@
   "auth": {
     "passwordResetSent": "Email de redefinição enviado",
     "passwordResetSuccess": "Senha redefinida com sucesso",
-    "forgotPasswordEmailSent": "Email de redefinição enviado",
+    "forgotPasswordEmailSent": "Se o email existir, um link de redefinição foi enviado",
     "email.invalid": "Email inválido"
   },
   "application": {
