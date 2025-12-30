@@ -11,4 +11,6 @@ router.post("/auth/validate-token", requireApplicationId, AuthController.validat
 router.get("/auth/validate-token", requireApplicationId, requireAuthToken, AuthController.validateToken.bind(AuthController));
 router.post("/auth/signup", requireApplicationId, AuthController.signUp.bind(AuthController));
 router.post("/auth/forgot-password", requireApplicationId, AuthController.forgotPassword.bind(AuthController));
+router.post("/auth/request-otp-login", requireApplicationId, AuthController.requestOtpLogin.bind(AuthController));
+router.post("/auth/verify-otp-login", requireApplicationId, AuthController.verifyOtpLogin.bind(AuthController));
 export default router;

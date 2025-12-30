@@ -8,7 +8,7 @@ async function runMigrations() {
 
     const files = fs.readdirSync(migrationsPath)
       .filter(file => file.endsWith(".sql"))
-      .filter(file => file === "005_password_resets.sql")
+      .filter(file => file === "006_auth_otps.sql")
       .sort(); // Ensures migrations run in order
 
     console.log('files', files);

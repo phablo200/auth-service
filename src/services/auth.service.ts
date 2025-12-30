@@ -8,16 +8,17 @@ import { DEFAULT_USER_ID } from "../constants/user.constants";
 import { DEFAULT_PROFILE_ID } from "../constants/profile.constants";
 import { DecodedToken } from "../models/auth.model";
 import passwordResetRepository from "../repositories/password-reset.repository";
-import { validateSignInInput, validateSignUpInput } from "../validators/auth.validator";
+import { validateRequestOtpInput, validateSignInInput, validateSignUpInput, validateVerifyOtpInput } from "../validators/auth.validator";
 import {
   InvalidCredentialsError,
   InvalidTokenError,
-  UserNotFoundError,
   EmailAlreadyInUseError,
 } from "../errors/auth.error";
 import emailService from "../mail/email.service";
 import { DEFAULT_APPLICATION_ID } from "../constants/application.constants";
 import { generatePasswordResetToken } from "../util/password.util";
+import { generateOtp, otpExpiresAt } from "../util/otp.util";
+import authOtpRepository from "../repositories/auth-otp.repository";
 
 class AuthService {
   async signIn(
@@ -207,8 +208,81 @@ class AuthService {
     return {
       messageKey: 'auth.passwordResetSuccess',
     };
-  } 
+  }
 
+
+  async requestOtpLogin(
+    applicationId: string,
+    email: string
+  ): Promise<{ messageKey: string }> {
+    validateRequestOtpInput({ email });
+
+    const user = await userRepository.findByEmail(applicationId, email);
+    if (!user || user.deleted) {
+      return { messageKey: "auth.otpLoginEmailSent" };
+    }
+  
+    const code = generateOtp();
+    const codeHash = await bcrypt.hash(code, 10);  
+    await authOtpRepository.create(
+      applicationId,
+      user.id,
+      codeHash,
+      otpExpiresAt()
+    );
+  
+    await emailService.sendOtpLoginEmail(user.email, code);
+  
+    return { messageKey: "auth.otpLoginEmailSent" };
+  }
+
+  async verifyOtpLogin(
+    applicationId: string,
+    email: string,
+    code: string
+  ): Promise<{ token: string; user: UserModel }> {
+    validateVerifyOtpInput({ email, code });
+
+    const user = await userRepository.findByEmail(applicationId, email);
+  
+    if (!user || user.deleted) {
+      throw new InvalidCredentialsError();
+    }
+  
+    const otp = await authOtpRepository.findLatestValid(
+      applicationId,
+      user.id
+    );
+  
+    if (!otp || otp.attempts >= 5) {
+      throw new InvalidCredentialsError();
+    }
+  
+    const isValid = await bcrypt.compare(code, otp.code_hash);
+  
+    if (!isValid) {
+      await authOtpRepository.incrementAttempts(otp.id);
+      throw new InvalidCredentialsError();
+    }
+  
+    await authOtpRepository.markUsed(otp.id);
+  
+    const token = jwt.sign(
+      {
+        sub: user.id,
+        email: user.email,
+        profile_id: user.profile_id,
+        application_id: applicationId,
+      },
+      process.env.JWT_SECRET as string,
+      { expiresIn: JWT_EXPIRES_IN }
+    );
+  
+    return {
+      token,
+      user: { ...user, password: "" },
+    };
+  }  
 }
 
 export default new AuthService();

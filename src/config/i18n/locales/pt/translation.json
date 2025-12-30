@@ -11,6 +11,7 @@
     "passwordResetSent": "Email de redefinição enviado",
     "passwordResetSuccess": "Senha redefinida com sucesso",
     "forgotPasswordEmailSent": "Se o email existir, um link de redefinição foi enviado",
+    "otpLoginEmailSent": "Se o email existir, um código foi enviado",
     "email.invalid": "Email inválido"
   },
   "application": {

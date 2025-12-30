@@ -87,6 +87,43 @@ class AuthController {
       next(err);
     }
   }
+
+  async requestOtpLogin(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email } = req.body;
+      const applicationId = getApplicationId(req)!;
+
+      const result = await authService.requestOtpLogin(
+        applicationId,
+        email
+      );
+
+      // Enumeration-safe message
+      res
+        .status(HttpStatus.OK)
+        .json({ message: req.t(result.messageKey) });
+    } catch (err) {
+      console.log('err', err);
+      next(err);
+    }
+  }
+
+  async verifyOtpLogin(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email, code } = req.body;
+      const applicationId = getApplicationId(req)!;
+
+      const result = await authService.verifyOtpLogin(
+        applicationId,
+        email,
+        code
+      );
+
+      res.status(HttpStatus.OK).json(result);
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 export default new AuthController();
