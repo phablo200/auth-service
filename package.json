@@ -10,9 +10,11 @@
         "build": "tsc",
         "start": "node dist/main.js",
         "lint": "eslint .",
-        "test": "jest",
         "migrate": "ts-node src/scripts/runMigration.ts",
-        "seed": "ts-node src/scripts/runSeed.ts"
+        "seed": "ts-node src/scripts/runSeed.ts",
+        "test": "vitest",
+        "test:watch": "vitest --watch",
+        "test:coverage": "vitest run --coverage"
     },
     "dependencies": {
         "bcrypt": "^6.0.0",
@@ -35,9 +37,12 @@
         "@types/node": "^20.11.30",
         "@types/nodemailer": "^7.0.4",
         "@types/pg": "^8.16.0",
+        "@vitest/coverage-v8": "^4.0.16",
         "nodemon": "^3.1.11",
         "ts-node": "^10.9.2",
-        "typescript": "^5.4.5"
+        "typescript": "^5.4.5",
+        "vite-tsconfig-paths": "^6.0.3",
+        "vitest": "^4.0.16"
     },
     "engines": {
         "node": ">=24.12.0"
