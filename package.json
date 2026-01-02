@@ -1,5 +1,5 @@
 {
-    "name": "food-data-platform",
+    "name": "auth210",
     "version": "1.0.0",
     "description": "Scalable API for storing, managing, and retrieving food nutritional data, including images and detailed macro information.",
     "author": "Phablo Vilas Boas",
