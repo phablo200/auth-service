@@ -11,7 +11,11 @@
       "passwordResetSent": "Password reset email sent",
       "passwordResetSuccess": "Password reset successfully",
       "forgotPasswordEmailSent": "if the email exists, a reset link was sent",
-      "email.invalid": "Invalid email"
+      "otpLoginEmailSent": "if the email exists, a code was sent",
+      "email.invalid": "Invalid email",
+      "apiKeyNotConfigured": "API key not configured",
+      "invalidApiKey": "Invalid API key",
+      "missingApiKey": "Missing API key"
     },
     "application": {
       "missingApplicationId": "Missing x-application-id header",

@@ -12,7 +12,10 @@
     "passwordResetSuccess": "Senha redefinida com sucesso",
     "forgotPasswordEmailSent": "Se o email existir, um link de redefinição foi enviado",
     "otpLoginEmailSent": "Se o email existir, um código foi enviado",
-    "email.invalid": "Email inválido"
+    "email.invalid": "Email inválido",
+    "apiKeyNotConfigured": "API key não configurada",
+    "invalidApiKey": "API key inválida",
+    "missingApiKey": "Falta a API key"
   },
   "application": {
     "missingApplicationId": "Falta o cabeçalho x-application-id",
