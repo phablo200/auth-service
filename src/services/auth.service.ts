@@ -21,23 +21,10 @@ import { generateOtp, otpExpiresAt } from "../util/otp.util";
 import authOtpRepository from "../repositories/auth-otp.repository";
 
 class AuthService {
-  async signIn(
+  private createAuthResponse(
     applicationId: string,
-    email: string,
-    password: string
-  ): Promise<{ token: string; user: UserModel }> {
-    validateSignInInput({ email, password });
-    const user = await userRepository.findByEmail(applicationId, email);
-
-    if (!user || user.deleted) {
-      throw new InvalidCredentialsError();
-    }
-
-    const passwordMatches = await bcrypt.compare(password, user.password);
-    if (!passwordMatches) {
-      throw new InvalidCredentialsError();
-    }
-
+    user: UserModel
+  ): { token: string; user: UserModel } {
     const token = jwt.sign(
       {
         sub: user.id,
@@ -58,6 +45,26 @@ class AuthService {
     };
   }
 
+  async signIn(
+    applicationId: string,
+    email: string,
+    password: string
+  ): Promise<{ token: string; user: UserModel }> {
+    validateSignInInput({ email, password });
+    const user = await userRepository.findByEmail(applicationId, email);
+
+    if (!user || user.deleted) {
+      throw new InvalidCredentialsError();
+    }
+
+    const passwordMatches = await bcrypt.compare(password, user.password);
+    if (!passwordMatches) {
+      throw new InvalidCredentialsError();
+    }
+
+    return this.createAuthResponse(applicationId, user);
+  }
+
   async signUp(
     applicationId: string,
     name: string,
@@ -65,7 +72,7 @@ class AuthService {
     password: string,
     profile_id: string = DEFAULT_PROFILE_ID,
     created_by: string = DEFAULT_USER_ID
-  ): Promise<UserModel> {
+  ): Promise<{ token: string; user: UserModel }> {
     validateSignUpInput({ name, email, password });
     const existingUser = await userRepository.findByEmailRegistered(
       applicationId,
@@ -82,19 +89,21 @@ class AuthService {
         hashedPassword
       );
 
-      return {
+      const restoredUser = {
         ...existingUser,
         deleted: false,
         password: hashedPassword,
         updated_at: new Date(),
       };
+
+      return this.createAuthResponse(applicationId, restoredUser);
     }
 
     if (existingUser) {
       throw new EmailAlreadyInUseError();
     }
 
-    return userRepository.create({
+    const createdUser = await userRepository.create({
       application_id: applicationId,
       name,
       email,
@@ -103,6 +112,8 @@ class AuthService {
       created_by,
       updated_by: created_by,
     });
+
+    return this.createAuthResponse(applicationId, createdUser);
   }
 
   async validateToken(token: string): Promise<{ valid: boolean }> {
@@ -267,21 +278,7 @@ class AuthService {
   
     await authOtpRepository.markUsed(otp.id);
   
-    const token = jwt.sign(
-      {
-        sub: user.id,
-        email: user.email,
-        profile_id: user.profile_id,
-        application_id: applicationId,
-      },
-      process.env.JWT_SECRET as string,
-      { expiresIn: JWT_EXPIRES_IN }
-    );
-  
-    return {
-      token,
-      user: { ...user, password: "" },
-    };
+    return this.createAuthResponse(applicationId, user);
   }  
 }
 

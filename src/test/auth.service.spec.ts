@@ -162,6 +162,7 @@ describe("AuthService.signUp", () => {
       deletedUser as any
     );
     vi.mocked(bcrypt.hash).mockResolvedValue(void 0);
+    vi.mocked(jwt.sign).mockReturnValue("jwt-token" as any);
 
     const result = await authService.signUp(
       applicationId,
@@ -172,13 +173,16 @@ describe("AuthService.signUp", () => {
 
     expect(userRepository.undeleteById).toHaveBeenCalled();
     expect(userRepository.updatePassword).toHaveBeenCalled();
-    expect(result.deleted).toBe(false);
+    expect(result.token).toBe("jwt-token");
+    expect(result.user.deleted).toBe(false);
+    expect(result.user.password).toBe("");
   });
 
-  it("creates new user when email is free", async () => {
+  it("returns token and redacted user when email is free", async () => {
     vi.mocked(userRepository.findByEmailRegistered).mockResolvedValue(null);
     vi.mocked(bcrypt.hash).mockResolvedValue(void 0);
     vi.mocked(userRepository.create).mockResolvedValue(user as any);
+    vi.mocked(jwt.sign).mockReturnValue("jwt-token" as any);
 
     const result = await authService.signUp(
       applicationId,
@@ -188,7 +192,8 @@ describe("AuthService.signUp", () => {
     );
 
     expect(userRepository.create).toHaveBeenCalled();
-    expect(result).toBe(user);
+    expect(result.token).toBe("jwt-token");
+    expect(result.user).toEqual({ ...user, password: "" });
   });
 });
 
