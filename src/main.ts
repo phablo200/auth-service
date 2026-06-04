@@ -1,9 +1,11 @@
 import express, { Request, Response } from "express";
+import cors from "cors";
 import fs from "fs";
 import path from "path";
 import userRoutes from "./routes/user.route";
 import authRoutes from "./routes/auth.routes";
 import i18next from "./config/i18n";
+import corsOptions from "./config/cors";
 import i18nextMiddleware from "i18next-http-middleware";
 import errorHandler from "./middleware/apperror.middleware";
 
@@ -15,7 +17,8 @@ const { version } = pkg;
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(express.json())
+app.use(cors(corsOptions));
+app.use(express.json());
 app.use(i18nextMiddleware.handle(i18next));
 app.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({ status: "ok" });
