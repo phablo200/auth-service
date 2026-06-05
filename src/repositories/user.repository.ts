@@ -67,7 +67,7 @@ class UserRepository {
     const query = `
       SELECT *
       FROM users
-      WHERE email = $1
+      WHERE lower(email) = lower($1)
         AND application_id = $2
         AND deleted = false
     `;
@@ -83,7 +83,7 @@ class UserRepository {
     const query = `
       SELECT *
       FROM users
-      WHERE email = $1
+      WHERE lower(email) = lower($1)
         AND application_id = $2
     `;
 
@@ -177,7 +177,7 @@ class UserRepository {
       SET
         deleted = false,
         updated_at = NOW()
-      WHERE email = $1
+      WHERE lower(email) = lower($1)
         AND application_id = $2
       RETURNING *
     `;

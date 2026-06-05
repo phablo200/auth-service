@@ -94,3 +94,41 @@ export function validateVerifyOtpInput(data: unknown) {
   }
   return result.data;
 }
+
+export const oauthProviderSchema = z.object({
+  provider: z
+    .string()
+    .regex(/^[a-z0-9-]+$/, "errors.providerNotSupported"),
+});
+
+export const oauthAuthorizeSchema = z.object({
+  redirect_uri: z.string().url(),
+});
+
+export const oauthExchangeSchema = z.object({
+  code: z.string().min(1),
+});
+
+export function validateOAuthProvider(data: unknown) {
+  const result = oauthProviderSchema.safeParse(data);
+  if (!result.success) {
+    throw new AppError(result.error.issues[0].message, 400);
+  }
+  return result.data;
+}
+
+export function validateOAuthAuthorizeInput(data: unknown) {
+  const result = oauthAuthorizeSchema.safeParse(data);
+  if (!result.success) {
+    throw new AppError(result.error.issues[0].message, 400);
+  }
+  return result.data;
+}
+
+export function validateOAuthExchangeInput(data: unknown) {
+  const result = oauthExchangeSchema.safeParse(data);
+  if (!result.success) {
+    throw new AppError(result.error.issues[0].message, 400);
+  }
+  return result.data;
+}

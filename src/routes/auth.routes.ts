@@ -6,6 +6,30 @@ import requireApiKey from "../middleware/apikey.middleware";
 
 const router = express.Router();
 
+router.get(
+  "/auth/oauth/providers",
+  AuthController.getOAuthProviders.bind(AuthController)
+);
+
+router.post(
+  "/auth/oauth/exchange",
+  requireApiKey,
+  requireApplicationId,
+  AuthController.exchangeOAuthCode.bind(AuthController)
+);
+
+router.post(
+  "/auth/oauth/:provider/authorize",
+  requireApiKey,
+  requireApplicationId,
+  AuthController.authorizeOAuth.bind(AuthController)
+);
+
+router.get(
+  "/auth/oauth/:provider/callback",
+  AuthController.handleOAuthCallback.bind(AuthController)
+);
+
 router.post(
   "/auth/signin",
   requireApiKey,

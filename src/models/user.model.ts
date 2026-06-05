@@ -4,7 +4,7 @@ export interface UserModel {
     application_id: string;
     name: string;
     email: string;
-    password: string;
+    password: string | null;
     deleted: boolean;
     created_at: Date;
     created_by: string | null;

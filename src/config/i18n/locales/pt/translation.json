@@ -5,6 +5,16 @@
     "userNotFound": "Usuário não encontrado",
     "invalidToken": "Token inválido",
     "unauthorized": "Não autorizado",
+    "providerNotSupported": "Provedor OAuth não suportado",
+    "oauthStateInvalid": "Estado OAuth inválido",
+    "oauthStateExpired": "Estado OAuth expirado",
+    "oauthCodeExchangeFailed": "Falha ao trocar código OAuth",
+    "providerEmailUnverified": "Email do provedor OAuth não verificado",
+    "oauthAccountConflict": "Este email já usa login com senha",
+    "oauthExchangeInvalid": "Código de troca OAuth inválido",
+    "oauthExchangeExpired": "Código de troca OAuth expirado",
+    "oauthProviderError": "Erro do provedor OAuth",
+    "oauthRedirectNotAllowed": "URI de redirecionamento OAuth não permitida",
     "internalServerError": "Erro interno do servidor"
   },
   "auth": {

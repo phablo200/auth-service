@@ -35,3 +35,4 @@ coverage/
 .cache/
 .eslintcache
 .workspace
+.env

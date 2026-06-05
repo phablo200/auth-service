@@ -8,7 +8,7 @@ async function runMigrations() {
 
     const files = fs.readdirSync(migrationsPath)
       .filter(file => file.endsWith(".sql"))
-      .filter(file => file === "006_auth_otps.sql")
+      .filter(file => file === "007_oauth_providers.sql")
       .sort(); // Ensures migrations run in order
 
     console.log('files', files);
@@ -22,6 +22,9 @@ async function runMigrations() {
     console.log("All migrations completed successfully.");
   } catch (err) {
     console.error("Migration failed:", err);
+    process.exitCode = 1;
+  } finally {
+    await pool.end();
   }
 }
 

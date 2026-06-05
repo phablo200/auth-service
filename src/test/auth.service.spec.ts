@@ -130,6 +130,19 @@ describe("AuthService.signIn", () => {
     ).rejects.toBeInstanceOf(InvalidCredentialsError);
   });
 
+  it("throws without comparing when user has no password", async () => {
+    vi.mocked(userRepository.findByEmail).mockResolvedValue({
+      ...user,
+      password: null,
+    } as any);
+
+    await expect(
+      authService.signIn(applicationId, user.email, "123456")
+    ).rejects.toBeInstanceOf(InvalidCredentialsError);
+
+    expect(bcrypt.compare).not.toHaveBeenCalled();
+  });
+
   it("returns token and user when credentials are valid", async () => {
     vi.mocked(userRepository.findByEmail).mockResolvedValue(user as any);
     vi.mocked(bcrypt.compare).mockResolvedValue(Promise.resolve(true) as any);

@@ -5,6 +5,16 @@
       "userNotFound": "User not found",
       "invalidToken": "Invalid token",
       "unauthorized": "Unauthorized",
+      "providerNotSupported": "OAuth provider is not supported",
+      "oauthStateInvalid": "OAuth state is invalid",
+      "oauthStateExpired": "OAuth state has expired",
+      "oauthCodeExchangeFailed": "OAuth code exchange failed",
+      "providerEmailUnverified": "OAuth provider email is not verified",
+      "oauthAccountConflict": "This email already uses password sign-in",
+      "oauthExchangeInvalid": "OAuth exchange code is invalid",
+      "oauthExchangeExpired": "OAuth exchange code has expired",
+      "oauthProviderError": "OAuth provider error",
+      "oauthRedirectNotAllowed": "OAuth redirect URI is not allowed",
       "internalServerError": "Internal server error"
     },
     "auth": {

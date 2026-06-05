@@ -21,7 +21,7 @@ import { generateOtp, otpExpiresAt } from "../util/otp.util";
 import authOtpRepository from "../repositories/auth-otp.repository";
 
 class AuthService {
-  private createAuthResponse(
+  createAuthResponse(
     applicationId: string,
     user: UserModel
   ): { token: string; user: UserModel } {
@@ -54,6 +54,10 @@ class AuthService {
     const user = await userRepository.findByEmail(applicationId, email);
 
     if (!user || user.deleted) {
+      throw new InvalidCredentialsError();
+    }
+
+    if (!user.password) {
       throw new InvalidCredentialsError();
     }
 
