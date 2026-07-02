@@ -90,13 +90,21 @@ resource "aws_route_table_association" "private" {
 
 resource "aws_security_group" "alb" {
   name        = "${var.name_prefix}-alb-sg"
-  description = "Allow HTTP traffic to the public ALB"
+  description = "Allow HTTP and HTTPS traffic to the public ALB"
   vpc_id      = aws_vpc.main.id
 
   ingress {
     description = "HTTP from allowed CIDR blocks"
     from_port   = 80
     to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = var.allowed_cidr_blocks
+  }
+
+  ingress {
+    description = "HTTPS from allowed CIDR blocks"
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = var.allowed_cidr_blocks
   }

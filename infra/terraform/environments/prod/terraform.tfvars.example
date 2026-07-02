@@ -5,10 +5,15 @@ aws_region   = "us-east-1"
 # Use the manual deploy convention: git-<short-commit-sha>
 container_image = "123456789012.dkr.ecr.us-east-1.amazonaws.com/auth-service-prod:git-a1b2c3d"
 
-budget_alert_email = "lokermia@gmail.com"
+budget_alert_email = "email@example.com"
 budget_limit_usd   = 30
 
 allowed_cidr_blocks = ["0.0.0.0/0"]
+
+# Optional for first apply. Keep null until the ACM certificate for
+# api.auth.phablovilasboas.tech is created and validated in us-east-1.
+# Example: "arn:aws:acm:us-east-1:123456789012:certificate/example"
+acm_certificate_arn = null
 
 db_name           = "auth210"
 db_username       = "auth210"
@@ -16,10 +21,10 @@ db_instance_class = "db.t4g.micro"
 
 app_environment_variables = {
   JWT_EXPIRES_IN                    = "15m"
-  OAUTH_PUBLIC_BASE_URL             = ""
+  OAUTH_PUBLIC_BASE_URL             = "https://api.auth.phablovilasboas.tech"
   OAUTH_STATE_TTL_SECONDS           = "600"
   OAUTH_EXCHANGE_CODE_TTL_SECONDS   = "300"
-  OAUTH_FRONTEND_REDIRECT_ALLOWLIST = ""
+  OAUTH_FRONTEND_REDIRECT_ALLOWLIST = "https://labs.phablovilasboas.tech"
   OAUTH_ENABLED_PROVIDERS           = "google,github"
   OAUTH_DEFAULT_PROFILE_ID          = ""
   GOOGLE_OAUTH_CALLBACK_PATH        = "/api/auth/oauth/google/callback"
@@ -30,5 +35,5 @@ app_environment_variables = {
   MAIL_HOST                         = ""
   MAIL_PORT                         = "587"
   MAIL_SECURE                       = "false"
-  APP_BASE_URL                      = ""
+  APP_BASE_URL                      = "https://api.auth.phablovilasboas.tech"
 }

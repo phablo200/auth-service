@@ -1,6 +1,7 @@
 locals {
   container_name  = "auth-service"
   repository_name = var.name_prefix
+  tls_enabled     = var.acm_certificate_arn != null && var.acm_certificate_arn != ""
 
   secret_arns = merge(
     {
@@ -139,13 +140,49 @@ resource "aws_lb_listener" "http" {
   port              = 80
   protocol          = "HTTP"
 
+  dynamic "default_action" {
+    for_each = local.tls_enabled ? [] : [1]
+
+    content {
+      type             = "forward"
+      target_group_arn = aws_lb_target_group.main.arn
+    }
+  }
+
+  dynamic "default_action" {
+    for_each = local.tls_enabled ? [1] : []
+
+    content {
+      type = "redirect"
+
+      redirect {
+        port        = "443"
+        protocol    = "HTTPS"
+        status_code = "HTTP_301"
+      }
+    }
+  }
+
+  tags = merge(var.tags, {
+    Name = "${var.name_prefix}-http-listener"
+  })
+}
+
+resource "aws_lb_listener" "https" {
+  count = local.tls_enabled ? 1 : 0
+
+  load_balancer_arn = var.alb_arn
+  port              = 443
+  protocol          = "HTTPS"
+  certificate_arn   = var.acm_certificate_arn
+
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.main.arn
   }
 
   tags = merge(var.tags, {
-    Name = "${var.name_prefix}-http-listener"
+    Name = "${var.name_prefix}-https-listener"
   })
 }
 
@@ -226,7 +263,8 @@ resource "aws_ecs_service" "main" {
   depends_on = [
     aws_iam_role_policy_attachment.task_execution_managed,
     aws_iam_role_policy.task_execution_secrets,
-    aws_lb_listener.http
+    aws_lb_listener.http,
+    aws_lb_listener.https
   ]
 
   tags = merge(var.tags, {

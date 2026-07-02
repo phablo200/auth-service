@@ -1,5 +1,6 @@
 locals {
-  name_prefix = "${var.project_name}-${var.environment}"
+  name_prefix     = "${var.project_name}-${var.environment}"
+  api_domain_name = "api.auth.phablovilasboas.tech"
 
   common_tags = {
     Project     = var.project_name
@@ -67,6 +68,7 @@ module "service" {
   public_subnet_ids      = module.networking.public_subnet_ids
   alb_arn                = module.networking.alb_arn
   alb_security_group_id  = module.networking.alb_security_group_id
+  acm_certificate_arn    = var.acm_certificate_arn
   ecs_security_group_id  = module.networking.ecs_security_group_id
   container_image        = var.container_image
   app_port               = var.app_port

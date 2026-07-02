@@ -35,9 +35,15 @@ variable "private_subnet_cidrs" {
 }
 
 variable "allowed_cidr_blocks" {
-  description = "CIDR blocks allowed to reach the public ALB over HTTP."
+  description = "CIDR blocks allowed to reach the public ALB over HTTP and HTTPS."
   type        = list(string)
   default     = ["0.0.0.0/0"]
+}
+
+variable "acm_certificate_arn" {
+  description = "Optional ACM certificate ARN for api.auth.phablovilasboas.tech."
+  type        = string
+  default     = null
 }
 
 variable "container_image" {
@@ -128,10 +134,10 @@ variable "app_environment_variables" {
   type        = map(string)
   default = {
     JWT_EXPIRES_IN                    = "15m"
-    OAUTH_PUBLIC_BASE_URL             = ""
+    OAUTH_PUBLIC_BASE_URL             = "https://api.auth.phablovilasboas.tech"
     OAUTH_STATE_TTL_SECONDS           = "600"
     OAUTH_EXCHANGE_CODE_TTL_SECONDS   = "300"
-    OAUTH_FRONTEND_REDIRECT_ALLOWLIST = ""
+    OAUTH_FRONTEND_REDIRECT_ALLOWLIST = "https://labs.phablovilasboas.tech"
     OAUTH_ENABLED_PROVIDERS           = "google,github"
     OAUTH_DEFAULT_PROFILE_ID          = ""
     GOOGLE_OAUTH_CALLBACK_PATH        = "/api/auth/oauth/google/callback"
@@ -142,6 +148,6 @@ variable "app_environment_variables" {
     MAIL_HOST                         = ""
     MAIL_PORT                         = "587"
     MAIL_SECURE                       = "false"
-    APP_BASE_URL                      = ""
+    APP_BASE_URL                      = "https://api.auth.phablovilasboas.tech"
   }
 }

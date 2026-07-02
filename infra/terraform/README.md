@@ -6,14 +6,24 @@ Architecture:
 
 ```text
 Internet
-  -> Application Load Balancer, HTTP only
+  -> Application Load Balancer, HTTPS on 443
   -> ECS Fargate task running auth-service
   -> RDS PostgreSQL
   -> Secrets Manager
   -> CloudWatch Logs
 ```
 
-It intentionally does not create Route 53, ACM, HTTPS, SSM Parameter Store, Redis/ElastiCache, GitHub Actions, NAT Gateway, or VPC endpoints.
+The public API domain is:
+
+```text
+https://api.auth.phablovilasboas.tech
+```
+
+`api.labs.phablovilasboas.tech` is intentionally not used. The `labs` subdomain is a CNAME to Vercel, whose inherited CAA policy blocked ACM issuance with `CAA_ERROR`.
+
+TLS terminates at the Application Load Balancer. Traffic from the ALB to the ECS task stays HTTP on the application port.
+
+It intentionally does not create Route 53, ACM certificates, Hostinger DNS records, SSM Parameter Store, Redis/ElastiCache, GitHub Actions, NAT Gateway, or VPC endpoints.
 
 ## Requirements
 
@@ -43,6 +53,7 @@ cp infra/terraform/environments/prod/terraform.tfvars.example infra/terraform/en
 Update:
 
 - `container_image`
+- `acm_certificate_arn`, after the ACM certificate is issued
 - OAuth public/callback values if OAuth will be tested
 - mail values if email delivery will be tested
 
@@ -56,7 +67,56 @@ terraform -chdir=infra/terraform/environments/prod plan
 terraform -chdir=infra/terraform/environments/prod apply
 ```
 
-The first apply creates the ECR repository and base infrastructure. The ECS task will not run successfully until a valid application image exists in ECR and required Secrets Manager values are populated.
+The first apply can run with `acm_certificate_arn = null`. In that mode, Terraform creates the ECR repository, base infrastructure, ALB, and an HTTP listener that forwards to ECS. The ECS task will not run successfully until a valid application image exists in ECR and required Secrets Manager values are populated.
+
+## Configure HTTPS
+
+After the first apply creates the ALB, get the ALB DNS name:
+
+```bash
+terraform -chdir=infra/terraform/environments/prod output alb_dns_name
+```
+
+Request an ACM public certificate manually:
+
+```text
+Domain: api.auth.phablovilasboas.tech
+Region: us-east-1
+Validation: DNS
+```
+
+Add the ACM validation CNAME in Hostinger for the `phablovilasboas.tech` DNS zone:
+
+```text
+<ACM validation CNAME name>  CNAME  <ACM validation CNAME value>
+```
+
+Wait until ACM shows the certificate status as `Issued`, then add the API CNAME in Hostinger:
+
+```text
+api.auth  CNAME  <ALB DNS name>
+```
+
+Copy the issued ACM certificate ARN into `terraform.tfvars`:
+
+```hcl
+acm_certificate_arn = "arn:aws:acm:us-east-1:<account-id>:certificate/<certificate-id>"
+```
+
+Apply Terraform again:
+
+```bash
+terraform -chdir=infra/terraform/environments/prod apply
+```
+
+The second apply creates the HTTPS listener on `443` and changes the HTTP listener on `80` to redirect to HTTPS.
+
+OAuth provider callback URLs should use:
+
+```text
+https://api.auth.phablovilasboas.tech/api/auth/oauth/google/callback
+https://api.auth.phablovilasboas.tech/api/auth/oauth/github/callback
+```
 
 ## Build And Push The Image
 
@@ -106,8 +166,11 @@ After the ECS service reaches steady state:
 
 ```bash
 terraform -chdir=infra/terraform/environments/prod output alb_url
-curl http://<alb-dns-name>/health
+curl -I http://api.auth.phablovilasboas.tech/health
+curl https://api.auth.phablovilasboas.tech/health
 ```
+
+The HTTP request should redirect to HTTPS.
 
 Expected response:
 

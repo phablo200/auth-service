@@ -1,11 +1,21 @@
 output "alb_dns_name" {
-  description = "Public ALB DNS name for lab HTTP access."
+  description = "Public ALB DNS name used as the Hostinger api.auth CNAME target."
   value       = module.networking.alb_dns_name
 }
 
+output "api_domain_name" {
+  description = "Public API domain name."
+  value       = local.api_domain_name
+}
+
+output "api_url" {
+  description = "Public HTTPS API URL."
+  value       = "https://${local.api_domain_name}"
+}
+
 output "alb_url" {
-  description = "Public HTTP URL for the lab service."
-  value       = "http://${module.networking.alb_dns_name}"
+  description = "Public HTTPS URL for the lab service."
+  value       = "https://${local.api_domain_name}"
 }
 
 output "ecr_repository_url" {

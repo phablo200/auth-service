@@ -28,6 +28,12 @@ variable "alb_security_group_id" {
   type        = string
 }
 
+variable "acm_certificate_arn" {
+  description = "Optional ACM certificate ARN used to enable HTTPS on the ALB."
+  type        = string
+  default     = null
+}
+
 variable "ecs_security_group_id" {
   description = "ECS task security group ID."
   type        = string
