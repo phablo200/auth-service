@@ -70,9 +70,9 @@ module "service" {
   ecs_security_group_id  = module.networking.ecs_security_group_id
   container_image        = var.container_image
   app_port               = var.app_port
-  cpu                    = var.cpu
-  memory                 = var.memory
-  desired_count          = var.desired_count
+  cpu                    = 256
+  memory                 = 512
+  desired_count          = 1
   environment_variables  = local.ecs_environment_variables
   db_password_secret_arn = module.database.db_password_secret_arn
   app_secret_names       = local.app_secret_names
