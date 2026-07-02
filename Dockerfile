@@ -23,6 +23,6 @@
     COPY --from=deps /app/node_modules ./node_modules
     COPY --from=build /app/dist ./dist
     
-    EXPOSE 3000
+    EXPOSE 3001
     
     CMD ["node", "dist/main.js"]
