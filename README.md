@@ -157,7 +157,7 @@ src/
 | `PORT` | Server port (default: 3001) |
 | `JWT_SECRET` | Secret key for JWT signing |
 | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | PostgreSQL connection settings |
-| `DATABASE_URL` | Optional PostgreSQL connection string override for migration tooling |
+| `DATABASE_URL` | PostgreSQL connection string used by migration tooling |
 
 ## Database Schema
 
@@ -184,9 +184,9 @@ npm run test      # Run tests
 
 ## Database Migrations
 
-Schema migrations use `node-pg-migrate`. The active migration files live in `src/db/migrations/` and are tracked in the database table `pgmigrations`.
+Schema migrations use the `node-pg-migrate` CLI directly from `package.json`. The active migration files live in `src/db/migrations/` and are tracked in the database table `pgmigrations`.
 
-The old SQL migration files are archived in `src/db/legacy-migrations/` for reference only. They are no longer executed by `npm run migrate`.
+The old SQL migration files were removed after the consolidated initial migration was created.
 
 For a fresh local database:
 
@@ -207,7 +207,7 @@ Seeds remain separate from schema migrations. `npm run seed` executes all `.sql`
 
 ### Manual Production Migrations
 
-For now, production migrations are run manually from a local machine by pointing `DB_*` or `DATABASE_URL` at the production database and running:
+For now, production migrations are run manually from a local machine by pointing `DATABASE_URL` at the production database and running:
 
 ```bash
 npm run migrate:up

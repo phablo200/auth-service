@@ -78,39 +78,28 @@ npm install -D node-pg-migrate
 
 Keep the application runtime dependency on `pg` unchanged.
 
-Add or update package scripts so migration operations are explicit:
+Add or update package scripts so migration operations call the `node-pg-migrate` CLI directly:
 
 ```json
 {
   "scripts": {
-    "migrate": "ts-node src/scripts/runMigration.ts up",
-    "migrate:up": "ts-node src/scripts/runMigration.ts up",
-    "migrate:down": "ts-node src/scripts/runMigration.ts down",
-    "migrate:create": "node-pg-migrate -j ts -m src/db/migrations create"
+    "migrate": "node-pg-migrate up -m src/db/migrations",
+    "migrate:up": "node-pg-migrate up -m src/db/migrations",
+    "migrate:down": "node-pg-migrate down -m src/db/migrations",
+    "migrate:create": "node-pg-migrate create -j ts -m src/db/migrations"
   }
 }
 ```
 
-Use a small TypeScript runner in `src/scripts/runMigration.ts` instead of relying only on the CLI for `up` and `down`. The runner should call `node-pg-migrate`'s programmatic API and pass the existing database environment values:
+Use `DATABASE_URL` as the migration CLI connection string. The application can continue using `DB_*`; migration execution does not need a custom TypeScript runner.
 
-- `DB_USER`
-- `DB_PASSWORD`
-- `DB_HOST`
-- `DB_PORT`
-- `DB_NAME`
+The CLI should use:
 
-Keep `DB_*` as the default migration configuration because it already matches the application and `.env.example`. The runner may also support `DATABASE_URL` as an optional convenience override, but `DATABASE_URL` must not become required for local, Docker, or deployment workflows.
-
-If the implementation keeps using `ts-node` for scripts, ensure `ts-node` is declared in `devDependencies` instead of relying on a global install.
-
-The runner should configure:
-
-- `dir: "src/db/migrations"`
-- `migrationsTable: "pgmigrations"`
-- `direction: "up"` or `"down"` from the command argument
-- `singleTransaction: true`
-- `checkOrder: true`
-- `noLock: false` so `node-pg-migrate` advisory locking remains enabled
+- migration directory: `src/db/migrations`
+- migrations table: `pgmigrations`
+- default `node-pg-migrate` single-transaction behavior
+- default `node-pg-migrate` order checking
+- default advisory locking
 
 ### Migration File Strategy
 
@@ -125,7 +114,7 @@ src/db/migrations/
 
 This project is still an initial product with no production database to preserve. Prefer one consolidated initial migration that creates the current intended schema directly. Do not create one new migration per old SQL file, because that would preserve broken or noisy history without giving production safety benefits.
 
-Do not keep the old `.sql` files in the active migration directory after conversion, because `node-pg-migrate` can load SQL files and may treat them as runnable migrations. Move them to a clearly inactive archive such as `src/db/legacy-migrations/` for short-term reference, or delete them after review.
+Do not keep the old `.sql` files in the active migration directory after conversion, because `node-pg-migrate` can load SQL files and may treat them as runnable migrations. Since this project has no production history to preserve, delete the old SQL migration files after the consolidated migration is created.
 
 The consolidated migration should preserve the current intended schema:
 
@@ -224,7 +213,7 @@ Update project docs to describe:
 
 1. Install and wire migration tooling
    - Add `node-pg-migrate`.
-   - Replace `src/scripts/runMigration.ts` with a programmatic runner.
+   - Replace the old migration script command with direct `node-pg-migrate` CLI commands.
    - Add `migrate:*` scripts in `package.json`.
    - Keep `npm run migrate` as the normal "apply pending migrations" command.
 
@@ -293,8 +282,6 @@ Update project docs to describe:
 
 Unit:
 
-- Add focused tests for any local migration helper that builds database config from `DB_*` environment variables.
-- Verify command argument parsing maps `up` and `down` to the expected runner options if that logic is kept in project code.
 - Add focused tests for seed file discovery if seed selection is extracted into a helper.
 
 Integration:
@@ -328,8 +315,8 @@ Manual verification:
 - Risk: Old `.sql` files remain in the active migration directory and run unexpectedly.
   - Mitigation: Archive or remove them from `src/db/migrations/` after TypeScript conversion.
 
-- Risk: The migration runner and application use different database configuration.
-  - Mitigation: Build runner configuration from the same `DB_*` environment variables used by `src/db/pool.ts`.
+- Risk: The application uses `DB_*` while migration commands use `DATABASE_URL`.
+  - Mitigation: Document `DATABASE_URL` clearly in `.env.example` and README as the migration CLI connection string.
 
 - Risk: Concurrent migration runs conflict.
   - Mitigation: Keep `node-pg-migrate` advisory locking enabled by leaving `noLock` set to `false`.

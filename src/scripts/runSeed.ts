@@ -1,7 +1,12 @@
 import fs from "fs";
 import path from "path";
 import pool from "../db/pool";
-import { listSqlFiles } from "./scriptUtils";
+
+function listSqlFiles(directory: string): string[] {
+  return fs.readdirSync(directory)
+    .filter((file) => path.extname(file) === ".sql")
+    .sort();
+}
 
 async function runSeeds() {
   try {

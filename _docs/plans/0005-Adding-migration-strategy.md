@@ -17,8 +17,7 @@ The implementation should start this initial product from a clean consolidated s
 - Use one consolidated initial schema migration instead of one migration per old SQL file.
 - Keep migration files under `src/db/migrations/`.
 - Move old `.sql` migration files out of the active migration directory after conversion.
-- Keep `DB_*` as the default database configuration.
-- Allow `DATABASE_URL` only as an optional convenience override.
+- Use `DATABASE_URL` for `node-pg-migrate` CLI database connection.
 - Keep seeds separate from schema migrations.
 - Fix `npm run seed` so it runs all seed SQL files in sorted order.
 - Run production migrations manually from the local machine for now.
@@ -30,18 +29,12 @@ The implementation should start this initial product from a clean consolidated s
 - `package.json` has:
 
 ```json
-"migrate": "ts-node src/scripts/runMigration.ts",
+"migrate": "node-pg-migrate up -m src/db/migrations",
 "seed": "ts-node src/scripts/runSeed.ts"
 ```
 
 - `node-pg-migrate` is not installed.
 - `ts-node` is used by scripts but is not declared in `devDependencies`.
-- `src/scripts/runMigration.ts` reads `.sql` files directly and currently filters to only:
-
-```text
-007_oauth_providers.sql
-```
-
 - `src/scripts/runSeed.ts` reads `.sql` files directly and currently filters to only:
 
 ```text
@@ -100,10 +93,10 @@ Tasks:
 
 ```json
 {
-  "migrate": "ts-node src/scripts/runMigration.ts up",
-  "migrate:up": "ts-node src/scripts/runMigration.ts up",
-  "migrate:down": "ts-node src/scripts/runMigration.ts down",
-  "migrate:create": "node-pg-migrate -j ts -m src/db/migrations create"
+  "migrate": "node-pg-migrate up -m src/db/migrations",
+  "migrate:up": "node-pg-migrate up -m src/db/migrations",
+  "migrate:down": "node-pg-migrate down -m src/db/migrations",
+  "migrate:create": "node-pg-migrate create -j ts -m src/db/migrations"
 }
 ```
 
@@ -119,7 +112,7 @@ Expected result:
 - `npm run migrate:down` rolls back the latest migration.
 - `npm run migrate:create -- <name>` creates a TypeScript migration.
 
-### 3. Replace The Migration Runner
+### 3. Remove The Custom Migration Runner
 
 Files:
 
@@ -127,43 +120,14 @@ Files:
 
 Tasks:
 
-- Replace the custom SQL-file loop with a programmatic `node-pg-migrate` runner.
-- Accept the migration direction from the command line:
-
-```text
-up
-down
-```
-
-- Default to `up` only if no argument is provided.
-- Build database config from `DB_*` values:
-
-```text
-DB_USER
-DB_PASSWORD
-DB_HOST
-DB_PORT
-DB_NAME
-```
-
-- If `DATABASE_URL` exists, allow it to override the assembled `DB_*` config.
-- Configure `node-pg-migrate` with:
-
-```text
-dir: src/db/migrations
-migrationsTable: pgmigrations
-direction: up | down
-singleTransaction: true
-checkOrder: true
-noLock: false
-```
-
-- Exit with a non-zero code on migration failure.
+- Delete the custom migration runner.
+- Use direct `node-pg-migrate` CLI commands from `package.json`.
+- Document that the migration CLI uses `DATABASE_URL`.
 
 Expected result:
 
-- The runner no longer reads or applies `.sql` migration files manually.
-- `node-pg-migrate` owns migration tracking through `pgmigrations`.
+- No project-owned script applies schema migrations.
+- `node-pg-migrate` owns migration execution and tracking through `pgmigrations`.
 
 ### 4. Create Consolidated Initial Migration
 
@@ -203,23 +167,15 @@ Important:
 - Do not recreate the behavior from `004_drop_and_add_application_id.sql`.
 - Do not split the initial schema into one file per old SQL migration.
 
-### 5. Archive Legacy SQL Migrations
+### 5. Remove Legacy SQL Migrations
 
 Files:
 
 - `src/db/migrations/*.sql`
-- `src/db/legacy-migrations/`
-
 Tasks:
 
-- Move the old `.sql` migration files out of `src/db/migrations/`.
-- Recommended destination:
-
-```text
-src/db/legacy-migrations/
-```
-
-- Keep the active migration directory limited to `node-pg-migrate` files.
+- Delete the old `.sql` migration files after the consolidated migration is created.
+- Keep `src/db/migrations/` limited to `node-pg-migrate` files.
 
 Expected result:
 
@@ -273,7 +229,7 @@ npm run migrate:up
 npm run seed
 ```
 
-- Document that old `.sql` migrations are archived and no longer active.
+- Document that old `.sql` migrations were removed and are no longer active.
 - Document that already-applied migrations must not be edited in shared environments.
 - Document that destructive migrations need backup and rollback notes.
 - Document that seeds are separate from migrations.
@@ -294,11 +250,6 @@ Files:
 
 Tasks:
 
-- If command parsing or database config building is extracted, test:
-  - default direction is `up`;
-  - `down` maps correctly;
-  - `DATABASE_URL` overrides `DB_*`;
-  - `DB_*` config is used when `DATABASE_URL` is absent.
 - If seed discovery is extracted, test:
   - only `.sql` files are selected;
   - files are sorted by filename;
