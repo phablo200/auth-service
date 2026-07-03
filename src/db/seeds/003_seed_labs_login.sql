@@ -7,4 +7,8 @@ VALUES (
     NOW(),
     NULL,
     FALSE
-);
+)
+ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    deleted = EXCLUDED.deleted,
+    updated_at = NOW();

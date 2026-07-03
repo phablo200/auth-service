@@ -49,7 +49,7 @@ cp .env.example .env
 docker-compose up -d
 
 # Run database migrations
-docker exec -it auth210-api npm run migrate
+docker exec -it auth210-api npm run migrate:up
 
 # Seed initial data
 docker exec -it auth210-api npm run seed
@@ -64,7 +64,7 @@ The API will be available at `http://localhost:3001`
 npm install
 
 # Run migrations
-npm run migrate
+npm run migrate:up
 
 # Seed database
 npm run seed
@@ -156,7 +156,8 @@ src/
 |----------|-------------|
 | `PORT` | Server port (default: 3001) |
 | `JWT_SECRET` | Secret key for JWT signing |
-| `DATABASE_URL` | PostgreSQL connection string |
+| `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | PostgreSQL connection settings |
+| `DATABASE_URL` | Optional PostgreSQL connection string override for migration tooling |
 
 ## Database Schema
 
@@ -172,13 +173,56 @@ src/
 npm run dev       # Start development server with hot reload
 npm run build     # Compile TypeScript
 npm run start     # Run production build
-npm run migrate   # Run database migrations
+npm run migrate   # Run pending database migrations
+npm run migrate:up      # Run pending database migrations
+npm run migrate:down    # Roll back the latest migration
+npm run migrate:create -- add-something # Create a migration
 npm run seed      # Seed initial data
 npm run lint      # Run ESLint
 npm run test      # Run tests
 ```
 
+## Database Migrations
+
+Schema migrations use `node-pg-migrate`. The active migration files live in `src/db/migrations/` and are tracked in the database table `pgmigrations`.
+
+The old SQL migration files are archived in `src/db/legacy-migrations/` for reference only. They are no longer executed by `npm run migrate`.
+
+For a fresh local database:
+
+```bash
+npm run migrate:up
+npm run seed
+```
+
+Create future schema changes with:
+
+```bash
+npm run migrate:create -- add-something
+```
+
+Do not edit a migration after it has been applied to a shared environment. Create a new migration instead. Destructive migrations should include rollback notes and a backup plan.
+
+Seeds remain separate from schema migrations. `npm run seed` executes all `.sql` files in `src/db/seeds/` in filename order.
+
+### Manual Production Migrations
+
+For now, production migrations are run manually from a local machine by pointing `DB_*` or `DATABASE_URL` at the production database and running:
+
+```bash
+npm run migrate:up
+```
+
+Before running against production:
+
+- Confirm credentials are not committed.
+- Confirm the active environment points to the intended production database.
+- Run `npm run build` and `npm run test`.
+- Validate the migration against a non-production database.
+- Back up production data before destructive or non-reversible changes.
+
+Migrations must not run automatically during API startup. ECS one-off migration tasks are deferred until deployment automation matures.
+
 ## License
 
 MIT © Phablo Vilas Boas
-

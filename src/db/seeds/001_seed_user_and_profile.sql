@@ -8,7 +8,11 @@ VALUES (
     NULL,
     NOW(),
     NULL
-);
+)
+ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    deleted = EXCLUDED.deleted,
+    updated_at = NOW();
 
 -- Insert a user linked to the above profile
 INSERT INTO users (id, name, email, password, deleted, profile_id, created_at, created_by, updated_at, updated_by)
@@ -24,4 +28,11 @@ VALUES (
     NULL,
     NOW(),
     NULL
-);
+)
+ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    email = EXCLUDED.email,
+    password = EXCLUDED.password,
+    deleted = EXCLUDED.deleted,
+    profile_id = EXCLUDED.profile_id,
+    updated_at = NOW();
