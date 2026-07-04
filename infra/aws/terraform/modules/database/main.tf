@@ -19,6 +19,28 @@ resource "aws_secretsmanager_secret_version" "db_password" {
   secret_string = random_password.db.result
 }
 
+resource "aws_secretsmanager_secret" "database_url" {
+  name                    = "${var.name_prefix}/database-url"
+  description             = "PostgreSQL connection URL for ${var.name_prefix}"
+  recovery_window_in_days = 0
+
+  tags = merge(var.tags, {
+    Name = "${var.name_prefix}-database-url"
+  })
+}
+
+resource "aws_secretsmanager_secret_version" "database_url" {
+  secret_id = aws_secretsmanager_secret.database_url.id
+  secret_string = format(
+    "postgresql://%s:%s@%s:%s/%s",
+    urlencode(aws_db_instance.main.username),
+    urlencode(random_password.db.result),
+    aws_db_instance.main.address,
+    aws_db_instance.main.port,
+    aws_db_instance.main.db_name
+  )
+}
+
 resource "aws_db_subnet_group" "main" {
   name       = "${var.name_prefix}-db-subnet-group"
   subnet_ids = var.private_subnet_ids

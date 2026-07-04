@@ -22,6 +22,10 @@
     COPY package*.json ./
     COPY --from=deps /app/node_modules ./node_modules
     COPY --from=build /app/dist ./dist
+    COPY src/db/migrations ./src/db/migrations
+    COPY src/db/seeds ./src/db/seeds
+    COPY src/scripts ./src/scripts
+    COPY tsconfig.json ./
     
     EXPOSE 3001
     

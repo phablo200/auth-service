@@ -24,10 +24,6 @@ locals {
     {
       NODE_ENV = "production"
       PORT     = tostring(var.app_port)
-      DB_HOST  = module.database.db_host
-      DB_PORT  = tostring(module.database.db_port)
-      DB_NAME  = module.database.db_name
-      DB_USER  = module.database.db_username
     }
   )
 }
@@ -62,24 +58,24 @@ module "database" {
 module "service" {
   source = "../../modules/service"
 
-  name_prefix            = local.name_prefix
-  aws_region             = var.aws_region
-  vpc_id                 = module.networking.vpc_id
-  public_subnet_ids      = module.networking.public_subnet_ids
-  alb_arn                = module.networking.alb_arn
-  alb_security_group_id  = module.networking.alb_security_group_id
-  acm_certificate_arn    = var.acm_certificate_arn
-  ecs_security_group_id  = module.networking.ecs_security_group_id
-  container_image        = var.container_image
-  app_port               = var.app_port
-  cpu                    = 256
-  memory                 = 512
-  desired_count          = 1
-  environment_variables  = local.ecs_environment_variables
-  db_password_secret_arn = module.database.db_password_secret_arn
-  app_secret_names       = local.app_secret_names
-  log_retention_days     = var.log_retention_days
-  tags                   = local.common_tags
+  name_prefix             = local.name_prefix
+  aws_region              = var.aws_region
+  vpc_id                  = module.networking.vpc_id
+  public_subnet_ids       = module.networking.public_subnet_ids
+  alb_arn                 = module.networking.alb_arn
+  alb_security_group_id   = module.networking.alb_security_group_id
+  acm_certificate_arn     = var.acm_certificate_arn
+  ecs_security_group_id   = module.networking.ecs_security_group_id
+  container_image         = var.container_image
+  app_port                = var.app_port
+  cpu                     = 256
+  memory                  = 512
+  desired_count           = 1
+  environment_variables   = local.ecs_environment_variables
+  database_url_secret_arn = module.database.database_url_secret_arn
+  app_secret_names        = local.app_secret_names
+  log_retention_days      = var.log_retention_days
+  tags                    = local.common_tags
 }
 
 resource "aws_budgets_budget" "monthly_lab" {

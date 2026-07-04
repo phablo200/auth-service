@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
 import { Pool } from "pg";
+import { createMaintenanceDatabaseConfig } from "../db/database.config";
 
 function listSqlFiles(directory: string): string[] {
   return fs.readdirSync(directory)
@@ -9,25 +10,9 @@ function listSqlFiles(directory: string): string[] {
     .sort();
 }
 
-function createSeedPool() {
-  if (process.env.DATABASE_URL) {
-    return new Pool({
-      connectionString: process.env.DATABASE_URL,
-    });
-  }
-
-  return new Pool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
-    port: Number(process.env.DB_PORT) || 5432,
-  });
-}
-
 async function runSeeds() {
   dotenv.config();
-  const pool = createSeedPool();
+  const pool = new Pool(createMaintenanceDatabaseConfig());
 
   try {
     const seedsPath = path.join(__dirname, "../db/seeds");

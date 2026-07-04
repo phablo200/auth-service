@@ -27,3 +27,8 @@ output "db_password_secret_arn" {
   description = "Secrets Manager ARN for the generated RDS password."
   value       = aws_secretsmanager_secret.db_password.arn
 }
+
+output "database_url_secret_arn" {
+  description = "Secrets Manager ARN for the generated PostgreSQL connection URL."
+  value       = aws_secretsmanager_secret.database_url.arn
+}

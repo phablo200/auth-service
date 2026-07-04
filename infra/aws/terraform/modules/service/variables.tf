@@ -69,8 +69,8 @@ variable "environment_variables" {
   type        = map(string)
 }
 
-variable "db_password_secret_arn" {
-  description = "Secrets Manager ARN for the database password."
+variable "database_url_secret_arn" {
+  description = "Secrets Manager ARN for the database connection URL."
   type        = string
 }
 

@@ -5,7 +5,7 @@ locals {
 
   secret_arns = merge(
     {
-      DB_PASSWORD = var.db_password_secret_arn
+      DATABASE_URL = var.database_url_secret_arn
     },
     {
       for name, secret in aws_secretsmanager_secret.app :

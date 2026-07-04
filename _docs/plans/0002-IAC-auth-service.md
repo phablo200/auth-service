@@ -147,10 +147,6 @@ Tasks:
 - Pass non-sensitive app config as ECS environment variables:
   - `NODE_ENV=production`
   - `PORT=3001`
-  - `DB_HOST`
-  - `DB_PORT=5432`
-  - `DB_NAME`
-  - `DB_USER`
   - `JWT_EXPIRES_IN`
   - `OAUTH_PUBLIC_BASE_URL`
   - `OAUTH_STATE_TTL_SECONDS`
@@ -168,7 +164,8 @@ Tasks:
   - `MAIL_SECURE`
   - `APP_BASE_URL`
 - Inject sensitive values from Secrets Manager:
-  - `DB_PASSWORD`
+  - `DATABASE_URL`
+  - `DATABASE_POOL_URL`
   - `JWT_SECRET`
   - `API_KEY`
   - `GOOGLE_OAUTH_CLIENT_ID`

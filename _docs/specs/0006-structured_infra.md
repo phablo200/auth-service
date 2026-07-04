@@ -126,7 +126,7 @@ infra/
     README.md
 ```
 
-Render secrets must not be committed. The Render config should declare required secret keys with provider-supported secret placeholders, while the actual values are configured in the Render dashboard. Neon connection details should be copied from Neon into Render as either a single `DATABASE_URL` or the existing split database variables used by the app: `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, and `DB_PASSWORD`.
+Render secrets must not be committed. The Render config should declare required secret keys with provider-supported secret placeholders, while the actual values are configured in the Render dashboard. Neon connection details should be copied from Neon into Render as `DATABASE_URL` for direct maintenance access and `DATABASE_POOL_URL` for pooled runtime access.
 
 The first Render + Neon deployment should keep the current auth-service app behavior and database schema exactly as-is. The same application code should deploy, the same migrations should run, and Neon should be treated as PostgreSQL in a different provider. Any schema simplification, migration automation, or runtime configuration cleanup should happen after the app is working on the lower-cost infrastructure.
 

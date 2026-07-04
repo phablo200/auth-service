@@ -14,7 +14,7 @@ The current project is a Node.js, Express, and TypeScript auth service with:
 - A runtime entrypoint of `node dist/main.js`.
 - A health endpoint at `GET /health`.
 - A default local port of `3001`, controlled by `PORT`.
-- PostgreSQL access through `pg` using `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, and `DB_PASSWORD`.
+- PostgreSQL access through `pg` using `DATABASE_URL`, with optional `DATABASE_POOL_URL` for pooled runtime traffic.
 - JWT, API key, OAuth, and SMTP settings supplied through environment variables.
 - SQL migrations and seeds under `src/db/migrations/` and `src/db/seeds/`.
 
@@ -176,10 +176,6 @@ Pass non-sensitive values directly as ECS environment variables when appropriate
 
 - `NODE_ENV=production`
 - `PORT=3001`
-- `DB_HOST`
-- `DB_PORT=5432`
-- `DB_NAME`
-- `DB_USER`
 - `JWT_EXPIRES_IN`
 - `OAUTH_PUBLIC_BASE_URL`
 - `OAUTH_STATE_TTL_SECONDS`
@@ -199,7 +195,8 @@ Pass non-sensitive values directly as ECS environment variables when appropriate
 
 Store sensitive values in Secrets Manager and inject them into the ECS task definition as secrets:
 
-- `DB_PASSWORD`
+- `DATABASE_URL`
+- `DATABASE_POOL_URL`
 - `JWT_SECRET`
 - `API_KEY`
 - `GOOGLE_OAUTH_CLIENT_ID`

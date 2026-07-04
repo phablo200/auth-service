@@ -156,8 +156,8 @@ src/
 |----------|-------------|
 | `PORT` | Server port (default: 3001) |
 | `JWT_SECRET` | Secret key for JWT signing |
-| `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | PostgreSQL connection settings |
-| `DATABASE_URL` | PostgreSQL connection string used by local migration and seed tooling |
+| `DATABASE_URL` | PostgreSQL direct connection string used by migration and seed tooling |
+| `DATABASE_POOL_URL` | PostgreSQL pooled connection string preferred by deployed app runtime |
 
 ## Database Schema
 
@@ -222,6 +222,21 @@ Before running against production:
 - Back up production data before destructive or non-reversible changes.
 
 Migrations must not run automatically during API startup. ECS one-off migration tasks are deferred until deployment automation matures.
+
+## Render + Neon Deployment
+
+The lower-cost deployment path uses Render for the API and Neon for PostgreSQL.
+
+- Render Blueprint: `infra/render/render.yaml`
+- Render setup notes: `infra/render/README.md`
+- Neon setup notes: `infra/neon/README.md`
+
+Use Neon connection strings this way:
+
+- `DATABASE_URL`: direct Neon connection string for migrations and seeds.
+- `DATABASE_POOL_URL`: pooled Neon connection string for API runtime.
+
+The first Render deployment uses the free plan and the HTTPS `onrender.com` URL. Custom domain migration is deferred until the Render deployment is validated.
 
 ## License
 

@@ -1,0 +1,69 @@
+services:
+  - type: web
+    name: auth-service
+    runtime: docker
+    plan: free
+    region: virginia
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    preDeployCommand: npm run migrate:up
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "10000"
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_POOL_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 15m
+      - key: API_KEY
+        sync: false
+      - key: OAUTH_PUBLIC_BASE_URL
+        value: https://auth-service.onrender.com
+      - key: OAUTH_STATE_TTL_SECONDS
+        value: "600"
+      - key: OAUTH_EXCHANGE_CODE_TTL_SECONDS
+        value: "300"
+      - key: OAUTH_FRONTEND_REDIRECT_ALLOWLIST
+        sync: false
+      - key: OAUTH_ENABLED_PROVIDERS
+        value: google,github
+      - key: OAUTH_DEFAULT_PROFILE_ID
+        sync: false
+      - key: GOOGLE_OAUTH_CLIENT_ID
+        sync: false
+      - key: GOOGLE_OAUTH_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_OAUTH_CALLBACK_PATH
+        value: /api/auth/oauth/google/callback
+      - key: GITHUB_OAUTH_CLIENT_ID
+        sync: false
+      - key: GITHUB_OAUTH_CLIENT_SECRET
+        sync: false
+      - key: GITHUB_OAUTH_CALLBACK_PATH
+        value: /api/auth/oauth/github/callback
+      - key: MAIL_PROVIDER
+        value: smtp
+      - key: MAIL_FROM_NAME
+        value: Auth210
+      - key: MAIL_FROM_EMAIL
+        sync: false
+      - key: MAIL_HOST
+        sync: false
+      - key: MAIL_PORT
+        value: "587"
+      - key: MAIL_SECURE
+        value: "false"
+      - key: MAIL_USER
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: APP_BASE_URL
+        value: https://auth-service.onrender.com
