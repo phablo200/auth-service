@@ -56,6 +56,16 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       FOREIGN KEY (updated_by)
       REFERENCES users(id);
 
+    ALTER TABLE applications
+      ADD CONSTRAINT fk_applications_created_by
+      FOREIGN KEY (created_by)
+      REFERENCES users(id);
+
+    ALTER TABLE applications
+      ADD CONSTRAINT fk_applications_updated_by
+      FOREIGN KEY (updated_by)
+      REFERENCES users(id);
+
     CREATE UNIQUE INDEX idx_users_application_email_unique
       ON users (application_id, lower(email))
       WHERE application_id IS NOT NULL;
@@ -151,6 +161,8 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
 
     ALTER TABLE profiles DROP CONSTRAINT IF EXISTS fk_profiles_updated_by;
     ALTER TABLE profiles DROP CONSTRAINT IF EXISTS fk_profiles_created_by;
+    ALTER TABLE applications DROP CONSTRAINT IF EXISTS fk_applications_updated_by;
+    ALTER TABLE applications DROP CONSTRAINT IF EXISTS fk_applications_created_by;
 
     DROP TABLE IF EXISTS users;
     DROP TABLE IF EXISTS applications;

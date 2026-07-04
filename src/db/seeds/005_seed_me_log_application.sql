@@ -1,6 +1,6 @@
 INSERT INTO applications (name, created_at, created_by, updated_at, updated_by, deleted)
 SELECT
-    'Food Data Platform',
+    'MeLabs',
     NOW(),
     NULL,
     NOW(),
@@ -9,11 +9,11 @@ SELECT
 WHERE NOT EXISTS (
     SELECT 1
     FROM applications
-    WHERE name = 'Food Data Platform'
+    WHERE name = 'MeLabs'
 );
 
 UPDATE applications
 SET
     deleted = FALSE,
     updated_at = NOW()
-WHERE name = 'Food Data Platform';
+WHERE name = 'MeLabs';

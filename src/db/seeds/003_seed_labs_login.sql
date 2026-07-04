@@ -1,3 +1,4 @@
+-- Stable fixture ID used by DEFAULT_APPLICATION_ID.
 INSERT INTO applications (id, name, created_at, created_by, updated_at, updated_by, deleted)
 VALUES (
     '00000000-0000-0000-0000-000000000002',

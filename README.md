@@ -157,7 +157,7 @@ src/
 | `PORT` | Server port (default: 3001) |
 | `JWT_SECRET` | Secret key for JWT signing |
 | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | PostgreSQL connection settings |
-| `DATABASE_URL` | PostgreSQL connection string used by migration tooling |
+| `DATABASE_URL` | PostgreSQL connection string used by local migration and seed tooling |
 
 ## Database Schema
 
